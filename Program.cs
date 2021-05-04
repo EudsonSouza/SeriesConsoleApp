@@ -35,6 +35,9 @@ namespace Series
                     case "X":
                         Exit();
                         return;
+                    default:
+                        Console.WriteLine("Invalid option, please type a menu option");
+                        break;
 
                 }
                 Console.WriteLine();
@@ -74,27 +77,62 @@ namespace Series
 
         private static Serie GetSerieDataFromUser()
         {
+            return GetSerieDataFromUser(rep.NextId());
+        }
+        private static Serie GetSerieDataFromUser(int id)
+        {
             Console.WriteLine();
             foreach (int i in Enum.GetValues(typeof(Genre)))
             {
                 Console.WriteLine("{0} - {1}", i, Enum.GetName(typeof(Genre), i));
             }
 
-            Console.Write("Type the code of Genre: ");
-            int genre = int.Parse(Console.ReadLine());
+            int genre = GetValidEnumFromUser();
 
             Console.Write("Type the serie title: ");
             string title = Console.ReadLine();
 
-            Console.Write("Type the serie realease year: ");
-            int year = int.Parse(Console.ReadLine());
+            int year = GetValidYearFromUser();
 
             Console.Write("Type the serie description: ");
             string description = Console.ReadLine();
 
-            Serie serie = new Serie(rep.NextId(), (Genre)genre, title, description, year);
+            Serie serie = new Serie(id, (Genre)genre, title, description, year);
 
             return serie;
+        }
+
+        private static int GetValidYearFromUser()
+        {
+            while (true)
+            {
+                Console.Write("Type the serie realease year: ");
+                if (int.TryParse(Console.ReadLine(), out int year))
+                {
+                    return year;
+                }
+
+            }
+
+        }
+
+        private static int GetValidEnumFromUser()
+        {
+            Console.WriteLine("Type the code of genre: ");
+
+            int enumCount = Enum.GetValues(typeof(Genre)).Length;
+            while (true)
+            {
+                if (int.TryParse(Console.ReadLine(), out int genre))
+                {
+                    if (0 <= genre && genre < enumCount)
+                    {
+                        return genre;
+                    }
+                }
+
+                Console.Write("Type a value between 0 and {0}: ", enumCount - 1);
+            }
         }
 
         private static void UpdateSerie()
@@ -102,7 +140,7 @@ namespace Series
 
             int id = GetSerieIdFromUser();
 
-            Serie serie = GetSerieDataFromUser();
+            Serie serie = GetSerieDataFromUser(id);
 
             rep.Update(id, serie);
 
@@ -112,10 +150,19 @@ namespace Series
         private static int GetSerieIdFromUser()
         {
             Console.WriteLine();
-            Console.Write("Type the serie index: ");
-            int id = int.Parse(Console.ReadLine());
+            while (true)
+            {
+                Console.Write("Type the serie index: ");
+                if (int.TryParse(Console.ReadLine(), out int id))
+                {
+                    if (0 <= id && id < rep.NextId() && !rep.GetById(id).isDeleted())
+                    {
+                        return id;
+                    }
 
-            return id;
+                }
+                ListSeries();
+            }
         }
 
         private static void DeleteSerie()
