@@ -8,7 +8,6 @@ namespace Series
         static SeriesRepository rep = new SeriesRepository();
         static void Main(string[] args)
         {
-            rep.Insert(new Serie(rep.NextId(), 0, "teste title", "teste descp", 20220));
             string userOption = "";
 
             while (userOption != "X")
